@@ -20,7 +20,8 @@ if (-not $Fast) {
     wwwroot/collect_new_articles.py `
     wwwroot/auto_scan_updates.py `
     wwwroot/auto_publish_daily.py `
-    wwwroot/check_featured_images.py
+    wwwroot/check_featured_images.py `
+    blog_open_source
 }
 
 Write-Host "Precheck passed."

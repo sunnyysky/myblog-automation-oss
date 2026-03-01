@@ -19,6 +19,8 @@
 !.github/workflows/precheck.yml
 !scripts/
 !scripts/precheck.ps1
+!blog_open_source/
+!blog_open_source/**
 
 # Environment template (never commit real .env)
 !.env.example

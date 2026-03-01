@@ -8,6 +8,7 @@ This repository is a sanitized, open-source subset of a production WordPress aut
 - Draft auto-publish script
 - Featured-image validation script
 - Strict source-vs-database compare script
+- Sanitized WordPress endpoint pack (`blog_open_source/`)
 - Operational documentation
 
 ## Not Included
