@@ -1,0 +1,41 @@
+name: precheck
+
+on:
+  push:
+    branches: [ "main", "feat/**", "fix/**", "chore/**" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Python syntax check
+        run: |
+          python -m py_compile compare_complete.py
+          python -m py_compile wwwroot/collect_all_123.py
+          python -m py_compile wwwroot/collect_new_articles.py
+          python -m py_compile wwwroot/auto_scan_updates.py
+          python -m py_compile wwwroot/auto_publish_daily.py
+          python -m py_compile wwwroot/check_featured_images.py
+
+      - name: Secret pattern scan
+        run: |
+          if grep -RInE "Sky!123456|8\.138\.213\.135|github_pat_|ghp_" \
+            compare_complete.py \
+            wwwroot/collect_all_123.py \
+            wwwroot/collect_new_articles.py \
+            wwwroot/auto_scan_updates.py \
+            wwwroot/auto_publish_daily.py \
+            wwwroot/check_featured_images.py; then
+            echo "Sensitive pattern detected."
+            exit 1
+          fi

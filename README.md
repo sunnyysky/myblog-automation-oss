@@ -37,3 +37,9 @@ python wwwroot/auto_publish_daily.py
 - Never commit `.env` or production snapshots
 
 See `docs/OPEN_SOURCE_RELEASE_GUIDE.md` for release and GitHub publishing workflow.
+
+## Iteration
+
+- Branch and commit workflow: `docs/DEV_WORKFLOW.md`
+- Local precheck script: `scripts/precheck.ps1`
+- CI precheck: `.github/workflows/precheck.yml`

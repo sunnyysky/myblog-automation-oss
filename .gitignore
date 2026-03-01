@@ -11,8 +11,14 @@
 !LICENSE
 !SECURITY.md
 !CONTRIBUTING.md
+!.gitmessage.txt
 !docs/
 !docs/**
+!.github/
+!.github/workflows/
+!.github/workflows/precheck.yml
+!scripts/
+!scripts/precheck.ps1
 
 # Environment template (never commit real .env)
 !.env.example
