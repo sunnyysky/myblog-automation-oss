@@ -1,0 +1,74 @@
+# Open-source whitelist strategy:
+# default ignore everything, then explicitly include safe files only.
+*
+
+# Keep Git metadata helpers
+!.gitignore
+!.gitattributes
+
+# Project docs
+!README.md
+!LICENSE
+!SECURITY.md
+!CONTRIBUTING.md
+!docs/
+!docs/**
+
+# Environment template (never commit real .env)
+!.env.example
+
+# Safe root scripts
+!compare_complete.py
+
+# Safe automation scripts
+!wwwroot/
+wwwroot/*
+!wwwroot/collect_all_123.py
+!wwwroot/collect_new_articles.py
+!wwwroot/auto_scan_updates.py
+!wwwroot/auto_publish_daily.py
+!wwwroot/check_featured_images.py
+
+# Python cache / runtime artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+config/
+
+# Local data / backups / archives
+backups/
+01*/
+03*/
+*.sql
+*.sqlite
+*.db
+*.log
+*.tmp
+*.bak
+*.backup
+
+# Reports and temporary scan outputs
+*report*.json
+_*.py
+_*.json
+uncollected_articles*.json
+all_source_articles*.json
+missing_articles*.json
+duplicate_ids.txt
+pass20012017.sql
+
+# WordPress runtime / uploads / cache / generated files
+wwwroot/wp-content/uploads/
+wwwroot/wp-content/cache/
+wwwroot/wp-content/upgrade/
+wwwroot/wp-config.php
+wwwroot/wp-config-*.php
+
+# IDE
+.vscode/
