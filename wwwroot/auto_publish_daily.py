@@ -37,6 +37,8 @@ ENV = load_env()
 # WordPress 配置（优先读取 .env）
 WP_URL = ENV.get("WP_URL", "https://example.com")
 WP_API_URL = f"{WP_URL}/wp-json/wp/v2"
+WP_REST_BASE = ENV.get("WP_REST_BASE", f"{WP_URL}/wp-json/myblog/v1")
+WP_USE_REST_API = ENV.get("WP_USE_REST_API", "0").lower() in ("1", "true", "yes", "on")
 WP_USERNAME = ENV.get("WP_ADMIN_USER", "admin")
 WP_PASSWORD = (
     ENV.get("WP_APP_PASSWORD")
@@ -58,8 +60,7 @@ class AutoPublisher:
         """加载已发布文章的标题（用于去重）"""
         try:
             print("正在加载已发布文章列表...")
-            # 使用自定义PHP接口获取已发布文章
-            url = f"{WP_URL}/get_published_posts.php"
+            url = f"{WP_REST_BASE}/published" if WP_USE_REST_API else f"{WP_URL}/get_published_posts.php"
             params = {'api_key': WP_PASSWORD}
 
             response = self.session.get(url, params=params, timeout=30)
@@ -79,8 +80,7 @@ class AutoPublisher:
         """获取草稿箱中的文章"""
         try:
             print("正在获取草稿箱文章...")
-            # 使用自定义PHP接口
-            url = f"{WP_URL}/get_drafts.php"
+            url = f"{WP_REST_BASE}/drafts" if WP_USE_REST_API else f"{WP_URL}/get_drafts.php"
             params = {'api_key': WP_PASSWORD}
 
             response = self.session.get(url, params=params, timeout=30)
@@ -135,8 +135,7 @@ class AutoPublisher:
     def publish_article(self, post_id, title):
         """发布单篇文章"""
         try:
-            # 使用wp_publish_helper.php发布
-            url = f"{WP_URL}/publish_draft.php"
+            url = f"{WP_REST_BASE}/publish-draft" if WP_USE_REST_API else f"{WP_URL}/publish_draft.php"
             data = {
                 'post_id': post_id,
                 'api_key': WP_PASSWORD

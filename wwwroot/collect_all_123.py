@@ -36,6 +36,8 @@ ENV = load_env()
 
 # WordPress 配置（优先读取 .env）
 WP_URL = ENV.get("WP_URL", "https://example.com")
+WP_REST_BASE = ENV.get("WP_REST_BASE", f"{WP_URL}/wp-json/myblog/v1")
+WP_USE_REST_API = ENV.get("WP_USE_REST_API", "0").lower() in ("1", "true", "yes", "on")
 WP_PASSWORD = (
     ENV.get("WP_API_KEY")
     or ENV.get("WP_APP_PASSWORD")
@@ -193,7 +195,7 @@ class AllCollector:
 
     def upload_image_to_wordpress(self, img_url):
         try:
-            upload_url = f"{WP_URL}/wp_upload_image.php"
+            upload_url = f"{WP_REST_BASE}/upload-image" if WP_USE_REST_API else f"{WP_URL}/wp_upload_image.php"
             response = requests.post(
                 upload_url,
                 data={'img_url': img_url, 'api_key': WP_PASSWORD},
@@ -417,7 +419,7 @@ class AllCollector:
             if article.get('featured_image_id'):
                 post_data['featured_image'] = article['featured_image_id']
 
-            publish_url = f"{WP_URL}/wp_publish_helper.php"
+            publish_url = f"{WP_REST_BASE}/posts" if WP_USE_REST_API else f"{WP_URL}/wp_publish_helper.php"
             response = requests.post(publish_url, data=post_data, timeout=60)
 
             if not response.text:

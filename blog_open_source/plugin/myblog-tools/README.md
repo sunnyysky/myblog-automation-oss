@@ -42,3 +42,10 @@ Base: `/wp-json/myblog/v1`
 - `POST /upload-image`
 
 POST body can be JSON or form-data and must include `api_key`.
+
+## Python Script Compatibility
+
+For this repository scripts, set:
+
+- `WP_USE_REST_API=1`
+- `WP_REST_BASE=https://your-site/wp-json/myblog/v1`
