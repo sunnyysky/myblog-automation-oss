@@ -10,6 +10,7 @@ This folder contains sanitized, reusable WordPress endpoint code extracted from 
 - `wp_delete_posts.php`
 - `wp_upload_image.php`
 - `wp_publish_helper.php`
+- Theme pack: `theme/justnews-child-functions.php`
 
 ## Security Model
 
