@@ -12,6 +12,7 @@ This folder contains sanitized, reusable WordPress endpoint code extracted from 
 - `wp_publish_helper.php`
 - Theme pack: `theme/justnews-child-functions.php`
 - Frontend scripts: `theme/js/defer-comments.js`, `theme/js/infinite-scroll-auto.js`
+- Installable plugin pack: `plugin/myblog-tools/`
 
 ## Security Model
 
