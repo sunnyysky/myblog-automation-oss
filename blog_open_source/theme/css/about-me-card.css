@@ -1,0 +1,260 @@
+.aboutme-card-page .aboutme-hero {
+    background: linear-gradient(130deg, #0f4fb8 0%, #1e7dd9 44%, #16b7c8 100%);
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(16, 62, 135, 0.24);
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+}
+
+.aboutme-card-page .aboutme-hero::after {
+    background: radial-gradient(circle at 14% 16%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 42%),
+                radial-gradient(circle at 88% 72%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 45%);
+    content: "";
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
+.aboutme-card-page .aboutme-hero-inner {
+    color: #fff;
+    padding: 28px 28px 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.aboutme-card-page .aboutme-pill {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    margin-bottom: 10px;
+    padding: 5px 12px;
+    text-transform: uppercase;
+}
+
+.aboutme-card-page .aboutme-hero h1 {
+    align-items: baseline;
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 8px;
+}
+
+.aboutme-card-page .aboutme-headline {
+    color: rgba(255, 255, 255, 0.96);
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 10px;
+}
+
+.aboutme-card-page .aboutme-intro {
+    color: rgba(255, 255, 255, 0.92);
+    margin: 0 0 10px;
+}
+
+.aboutme-card-page .aboutme-city {
+    align-items: center;
+    color: rgba(255, 255, 255, 0.9);
+    display: inline-flex;
+    gap: 6px;
+    margin: 0 0 10px;
+}
+
+.aboutme-card-page .aboutme-desc {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.94);
+    margin-bottom: 12px;
+    max-width: 860px;
+    padding: 10px 12px;
+}
+
+.aboutme-card-page .aboutme-cta-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.aboutme-card-page .aboutme-btn {
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: all .2s ease;
+}
+
+.aboutme-card-page .aboutme-btn-primary {
+    background: #fff;
+    color: #1257b9;
+}
+
+.aboutme-card-page .aboutme-btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    color: #fff;
+}
+
+.aboutme-card-page .aboutme-panel,
+.aboutme-card-page .aboutme-side-panel {
+    border-radius: 14px;
+    box-shadow: 0 12px 24px rgba(20, 56, 111, 0.12);
+    overflow: hidden;
+}
+
+.aboutme-card-page .aboutme-panel .sec-panel-head,
+.aboutme-card-page .aboutme-side-panel .sec-panel-head {
+    border-bottom: 1px solid #e2ebfb;
+    padding: 14px 16px;
+}
+
+.aboutme-card-page .aboutme-panel .sec-panel-head h2,
+.aboutme-card-page .aboutme-side-panel .sec-panel-head h2 {
+    align-items: center;
+    border-bottom: 0;
+    color: #1f3f6d;
+    display: inline-flex;
+    gap: 8px;
+    margin: 0;
+}
+
+.aboutme-card-page .aboutme-side-panel .panel-icon {
+    align-items: center;
+    background: linear-gradient(120deg, #1b79d8, #1eb8c5);
+    border-radius: 999px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 12px;
+    height: 24px;
+    justify-content: center;
+    width: 24px;
+}
+
+.aboutme-card-page .aboutme-panel .sec-panel-body,
+.aboutme-card-page .aboutme-side-panel .sec-panel-body {
+    padding: 14px 16px 16px;
+}
+
+.aboutme-card-page .aboutme-feature-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.aboutme-card-page .aboutme-feature-card {
+    background: linear-gradient(140deg, #f7fbff 0%, #eef6ff 100%);
+    border: 1px solid #dbe8ff;
+    border-radius: 12px;
+    min-height: 94px;
+    padding: 12px;
+}
+
+.aboutme-card-page .aboutme-method-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.aboutme-card-page .aboutme-method-card {
+    border: 1px solid #d9e7fd;
+    border-radius: 12px;
+    min-height: 100px;
+    padding: 12px;
+}
+
+.aboutme-card-page .aboutme-highlight-list,
+.aboutme-card-page .aboutme-mini-list,
+.aboutme-card-page .aboutme-link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.aboutme-card-page .aboutme-highlight-list li,
+.aboutme-card-page .aboutme-mini-list li {
+    border-bottom: 1px dashed #e3ebf8;
+    color: #26466d;
+    padding: 8px 0 8px 14px;
+    position: relative;
+}
+
+.aboutme-card-page .aboutme-highlight-list li::before,
+.aboutme-card-page .aboutme-mini-list li::before {
+    background: linear-gradient(120deg, #1f7bd9, #23bbbf);
+    border-radius: 999px;
+    content: "";
+    height: 7px;
+    left: 0;
+    position: absolute;
+    top: 14px;
+    width: 7px;
+}
+
+.aboutme-card-page .aboutme-qr-wrap {
+    background: #fff;
+    border: 1px solid #dbe8f8;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    padding: 8px;
+}
+
+.aboutme-card-page .aboutme-qr {
+    border-radius: 8px;
+    display: block;
+    height: auto;
+    width: 100%;
+}
+
+.aboutme-card-page .aboutme-stat-grid {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 10px;
+}
+
+.aboutme-card-page .aboutme-stat-grid .stat-item {
+    background: linear-gradient(145deg, #f6fbff, #edf6ff);
+    border: 1px solid #d8e8ff;
+    border-radius: 10px;
+    min-height: 72px;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+.aboutme-card-page .aboutme-stat-grid .stat-num {
+    color: #1e5ea8;
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.aboutme-card-page .aboutme-stat-grid .stat-label {
+    color: #607b9d;
+    font-size: 12px;
+}
+
+@media (max-width: 991px) {
+    .aboutme-card-page .aboutme-hero-inner {
+        padding: 20px 16px 22px;
+    }
+
+    .aboutme-card-page .aboutme-feature-grid,
+    .aboutme-card-page .aboutme-method-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .aboutme-card-page .aboutme-panel .sec-panel-head,
+    .aboutme-card-page .aboutme-side-panel .sec-panel-head,
+    .aboutme-card-page .aboutme-panel .sec-panel-body,
+    .aboutme-card-page .aboutme-side-panel .sec-panel-body {
+        padding: 10px 12px;
+    }
+}

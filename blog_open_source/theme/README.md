@@ -5,6 +5,9 @@ This folder contains a reusable child-theme function bundle extracted from produ
 ## File
 
 - `justnews-child-functions.php`
+- `about-me-profile.php`
+- `category-about-me.php`
+- `css/about-me-card.css`
 - `js/defer-comments.js`
 - `js/infinite-scroll-auto.js`
 
@@ -47,3 +50,30 @@ The `delete_duplicate_posts` AJAX endpoint checks API key from:
 2. `BLOG_API_KEY` constant in `wp-config.php`
 
 If not configured, endpoint returns error.
+
+## About-Me Card Page (Optional)
+
+This pack now includes a reusable personal card page for `/category/about-me/`:
+
+1. Copy `about-me-profile.php` into your active child theme root.
+2. Copy `category-about-me.php` into your active child theme root.
+3. Copy `css/about-me-card.css` into your child theme and enqueue it:
+
+```php
+add_action('wp_enqueue_scripts', function () {
+    if (is_category('about-me')) {
+        wp_enqueue_style(
+            'about-me-card',
+            get_stylesheet_directory_uri() . '/css/about-me-card.css',
+            [],
+            null
+        );
+    }
+});
+```
+
+4. Edit `myblog_get_about_profile_config()` in `about-me-profile.php` with your own public profile data.
+
+Security note:
+- Do not commit private contact channels if you do not want them public.
+- Keep `wechat_qr` / profile fields as placeholders in public repos.
