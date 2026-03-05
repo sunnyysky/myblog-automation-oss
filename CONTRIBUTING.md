@@ -22,4 +22,4 @@
   - `python -m py_compile wwwroot/check_featured_images.py`
 
 - Secret scan:
-  - `rg -n "Sky!123456|8\\.138\\.213\\.135" .`
+  - `rg -n "REDACTED_PASSWORD_EXAMPLE|REDACTED_SERVER_IP_EXAMPLE|github_pat_|ghp_" .`

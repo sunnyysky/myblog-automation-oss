@@ -19,6 +19,6 @@ Contact the maintainer privately and include:
 
 ## Pre-Release Security Checklist
 
-1. `rg "Sky!123456|8\\.138\\.213\\.135|api_key=.*[A-Za-z0-9]"` returns no real secrets in tracked files.
+1. `rg "REDACTED_PASSWORD_EXAMPLE|REDACTED_SERVER_IP_EXAMPLE|api_key=.*[A-Za-z0-9]"` returns no real secrets in tracked files.
 2. `.env` is excluded by `.gitignore`.
 3. No production backups, SQL dumps, or runtime uploads are tracked.

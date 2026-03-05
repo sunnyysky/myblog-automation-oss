@@ -29,7 +29,7 @@ jobs:
 
       - name: Secret pattern scan
         run: |
-          if grep -RInE "Sky!123456|8\.138\.213\.135|github_pat_|ghp_" \
+          if grep -RInE "REDACTED_PASSWORD_EXAMPLE|REDACTED_SERVER_IP_EXAMPLE|github_pat_|ghp_" \
             compare_complete.py \
             wwwroot/collect_all_123.py \
             wwwroot/collect_new_articles.py \

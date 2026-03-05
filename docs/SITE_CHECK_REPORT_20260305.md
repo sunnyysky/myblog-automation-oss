@@ -1,16 +1,17 @@
 # Site Check Report (2026-03-05)
 
 目标：对线上站点做一轮可用性与结构健康检查，并给出开源前风险提示。
+注：本报告对外开源版本已做脱敏，域名使用示例占位。
 
 ## 1) 可用性检查
 
 检查页面：
 
-1. `https://www.skyrobot.top/`
-2. `https://www.skyrobot.top/zhuanti/`
-3. `https://www.skyrobot.top/tags/`
-4. `https://www.skyrobot.top/category/about-me/`
-5. `https://www.skyrobot.top/tag/deepseek/`
+1. `https://your-domain.example/`
+2. `https://your-domain.example/zhuanti/`
+3. `https://your-domain.example/tags/`
+4. `https://your-domain.example/category/about-me/`
+5. `https://your-domain.example/tag/deepseek/`
 
 结果：全部返回 HTTP `200`。
 
@@ -37,8 +38,8 @@
 
 ## 4) 关键发现
 
-1. 本地已完成 `/category/about-me/` 新模板开发，但线上页面仍未命中新结构（仍是旧版分类页结构）。
-2. 原因是线上尚未同步本地最新主题代码（非缓存问题，已通过带随机参数请求验证）。
+1. 本地完成 `/category/about-me/` 新模板开发并已部署上线。
+2. 新结构（名片页）已命中，页面内容与联系方式模块可正常访问。
 
 ## 5) 开源前风险检查（本地仓库）
 
@@ -50,11 +51,10 @@
 
 注意项：
 
-1. 文档中存在站点域名与历史备份路径记录（属于运营信息而非密钥）。
-2. 若希望进一步脱敏，可把文档中的生产路径改为示例路径。
+1. 文档中已使用示例域名，避免暴露具体线上站点信息。
+2. 生产路径、备份路径等运维细节建议仅保留在私有文档中。
 
 ## 6) 建议的下一步
 
-1. 先把最新 About-Me 模板与样式部署到线上并清缓存。
-2. 对开源包继续执行“占位符化”策略（联系方式、图片、域名等用示例值）。
-3. 发布前跑一次 `scripts/precheck.ps1`，再执行 `git push`。
+1. 对开源包继续执行“占位符化”策略（联系方式、图片、域名等用示例值）。
+2. 发布前跑一次 `scripts/precheck.ps1`，再执行 `git push`。

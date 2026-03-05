@@ -15,8 +15,8 @@ This check verifies the files intended for public release (whitelisted by `.giti
    - `wwwroot/check_featured_images.py`
 
 2. Secret string scan in public files:
-   - `Sky!123456`
-   - `8.138.213.135`
+   - `REDACTED_PASSWORD_EXAMPLE`
+   - `REDACTED_SERVER_IP_EXAMPLE`
 
 ## Result
 

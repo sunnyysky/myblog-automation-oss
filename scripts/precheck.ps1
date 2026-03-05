@@ -14,7 +14,7 @@ python -m py_compile wwwroot/check_featured_images.py
 
 if (-not $Fast) {
   Write-Host "== Precheck: Secret scan (tracked scope) =="
-  rg -n "Sky!123456|8\.138\.213\.135|github_pat_|ghp_" `
+  rg -n "REDACTED_PASSWORD_EXAMPLE|REDACTED_SERVER_IP_EXAMPLE|github_pat_|ghp_" `
     compare_complete.py `
     wwwroot/collect_all_123.py `
     wwwroot/collect_new_articles.py `
