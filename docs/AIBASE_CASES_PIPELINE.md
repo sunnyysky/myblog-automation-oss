@@ -6,6 +6,7 @@ This pipeline collects all AI cases from `https://www.aibase.com/zh/cases`, stor
 
 - Collector: `wwwroot/collect_aibase_cases.py`
 - Daily publisher: `wwwroot/auto_publish_cases_daily.py`
+- Health check: `wwwroot/health_check_cases.py`
 
 ## Collector Behavior
 
@@ -73,6 +74,7 @@ DB_TABLE_PREFIX=blog_
 ```powershell
 python wwwroot/collect_aibase_cases.py --mode incremental --max-pages 1 --batch-size 5 --dry-run
 python wwwroot/auto_publish_cases_daily.py --slot manual --count 2 --dry-run
+python wwwroot/health_check_cases.py --json
 ```
 
 ## Backfill (All cases -> drafts)
@@ -109,4 +111,7 @@ python wwwroot/auto_publish_cases_daily.py --slot evening
 # Daily publish slots
 0 9 * * * cd /www/wwwroot/www.skyrobot.top && /usr/bin/python3 auto_publish_cases_daily.py --slot morning >> /var/log/aibase_cases_publish.log 2>&1
 0 18 * * * cd /www/wwwroot/www.skyrobot.top && /usr/bin/python3 auto_publish_cases_daily.py --slot evening >> /var/log/aibase_cases_publish.log 2>&1
+
+# Optional health check report (warnings/errors only)
+10 19 * * * cd /www/wwwroot/www.skyrobot.top && /usr/bin/python3 health_check_cases.py --strict >> /var/log/aibase_cases_health.log 2>&1
 ```

@@ -39,6 +39,7 @@ wwwroot/*
 !wwwroot/collect_external_feeds.py
 !wwwroot/collect_aibase_cases.py
 !wwwroot/auto_publish_cases_daily.py
+!wwwroot/health_check_cases.py
 
 # Python cache / runtime artifacts
 __pycache__/
