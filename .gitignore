@@ -36,6 +36,9 @@ wwwroot/*
 !wwwroot/auto_scan_updates.py
 !wwwroot/auto_publish_daily.py
 !wwwroot/check_featured_images.py
+!wwwroot/collect_external_feeds.py
+!wwwroot/collect_aibase_cases.py
+!wwwroot/auto_publish_cases_daily.py
 
 # Python cache / runtime artifacts
 __pycache__/

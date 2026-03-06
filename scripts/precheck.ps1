@@ -11,6 +11,9 @@ python -m py_compile wwwroot/collect_new_articles.py
 python -m py_compile wwwroot/auto_scan_updates.py
 python -m py_compile wwwroot/auto_publish_daily.py
 python -m py_compile wwwroot/check_featured_images.py
+python -m py_compile wwwroot/collect_external_feeds.py
+python -m py_compile wwwroot/collect_aibase_cases.py
+python -m py_compile wwwroot/auto_publish_cases_daily.py
 
 if (-not $Fast) {
   Write-Host "== Precheck: Secret scan (tracked scope) =="
@@ -21,6 +24,9 @@ if (-not $Fast) {
     wwwroot/auto_scan_updates.py `
     wwwroot/auto_publish_daily.py `
     wwwroot/check_featured_images.py `
+    wwwroot/collect_external_feeds.py `
+    wwwroot/collect_aibase_cases.py `
+    wwwroot/auto_publish_cases_daily.py `
     blog_open_source
 }
 
