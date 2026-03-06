@@ -216,6 +216,10 @@ function myblog_tools_route_upload_image($request) {
     $img_url = isset($p['img_url']) ? (string)$p['img_url'] : '';
     if (!$img_url) return myblog_tools_fail('img_url is required');
 
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    require_once ABSPATH . 'wp-admin/includes/media.php';
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+
     $tmp = download_url($img_url, 30);
     if (is_wp_error($tmp)) return myblog_tools_fail($tmp->get_error_message(), 500);
 
@@ -226,10 +230,6 @@ function myblog_tools_route_upload_image($request) {
         'name' => sanitize_file_name($filename),
         'tmp_name' => $tmp,
     ];
-
-    require_once ABSPATH . 'wp-admin/includes/file.php';
-    require_once ABSPATH . 'wp-admin/includes/media.php';
-    require_once ABSPATH . 'wp-admin/includes/image.php';
 
     $attach_id = media_handle_sideload($file_array, 0);
     if (is_wp_error($attach_id)) {

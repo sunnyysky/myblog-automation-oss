@@ -14,6 +14,9 @@ This pipeline collects all AI cases from `https://www.aibase.com/zh/cases`, stor
   - list: `/ai/GetAiInfoList.aspx` (`type=5`, `flag=zh`)
   - detail: `/ai/GetAiCommunityById.aspx`
 - Preserves case structure in content and applies light normalization.
+- Cleans malformed source tags (brackets/quotes/乱码 tokens).
+- By default, uses curated tags only (`AIBASE_CASES_USE_SOURCE_TAGS=0`).
+- By default, does not render source publish-time/tag chips in article body.
 - Enforces basic quality gate before draft creation:
   - title length
   - minimum text length
@@ -53,6 +56,9 @@ AIBASE_CASES_DRAFT_STATUS=draft
 AIBASE_CASES_CATEGORY=AI案例
 AIBASE_CASES_CATEGORY_SLUG=ai-cases
 AIBASE_CASES_TAGS=AI案例,案例拆解,AI变现
+AIBASE_CASES_USE_SOURCE_TAGS=0
+AIBASE_CASES_INCLUDE_META_IN_CONTENT=0
+AIBASE_CASES_INCLUDE_SOURCE_TAGS_IN_CONTENT=0
 AIBASE_CASES_NO_SOURCE_LINK=1
 AIBASE_CASES_SLEEP_SECONDS=1
 AIBASE_CASES_HISTORY_FILE=wwwroot/runtime/aibase_cases_history.json

@@ -30,6 +30,12 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
 curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
+curl_setopt($ch, CURLOPT_ENCODING, '');
+$http_headers = [
+    'Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+    'Accept-Encoding: gzip,deflate,br',
+];
+curl_setopt($ch, CURLOPT_HTTPHEADER, $http_headers);
 $img_data = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $error = curl_error($ch);
@@ -37,6 +43,14 @@ curl_close($ch);
 
 if ($error || $http_code !== 200 || !$img_data) {
     blog_fail_json("Download failed HTTP:$http_code $error");
+}
+
+// Some sources still return gzipped bytes. Normalize to raw image bytes.
+if (strncmp($img_data, "\x1f\x8b", 2) === 0) {
+    $decoded = @gzdecode($img_data);
+    if ($decoded !== false && strlen($decoded) > 0) {
+        $img_data = $decoded;
+    }
 }
 
 $path = parse_url($img_url, PHP_URL_PATH);
@@ -71,7 +85,9 @@ if (is_wp_error($attach_id)) {
 
 require_once ABSPATH . 'wp-admin/includes/image.php';
 $attach_data = wp_generate_attachment_metadata($attach_id, $file_path);
-wp_update_attachment_metadata($attach_id, $attach_data);
+if (is_array($attach_data) && !empty($attach_data)) {
+    wp_update_attachment_metadata($attach_id, $attach_data);
+}
 
 echo json_encode([
     'success' => true,

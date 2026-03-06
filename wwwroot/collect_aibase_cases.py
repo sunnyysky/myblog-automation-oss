@@ -9,6 +9,8 @@ Data source:
 """
 
 import argparse
+import ast
+import html as html_lib
 import io
 import json
 import os
@@ -18,6 +20,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -99,23 +102,81 @@ def sanitize_text(text: str, max_len: int = 170) -> str:
 
 
 def parse_tags(raw_tags: object) -> List[str]:
-    tags: List[str] = []
+    items: List[str] = []
     if isinstance(raw_tags, list):
-        tags = [str(x).strip() for x in raw_tags if str(x).strip()]
-        return tags
-    if isinstance(raw_tags, str):
+        items = [str(x).strip() for x in raw_tags if str(x).strip()]
+    elif isinstance(raw_tags, str):
         source = raw_tags.strip()
         if not source:
             return []
-        try:
-            decoded = json.loads(source)
-            if isinstance(decoded, list):
-                return [str(x).strip() for x in decoded if str(x).strip()]
-        except json.JSONDecodeError:
-            pass
-        split_tags = re.split(r"[,，/|]", source)
-        return [t.strip() for t in split_tags if t.strip()]
-    return []
+
+        decoded_items: List[str] = []
+        parse_attempts = [source]
+        if source.startswith("[") and source.endswith("]"):
+            parse_attempts.append(source.replace("'", '"'))
+
+        for candidate in parse_attempts:
+            try:
+                parsed = json.loads(candidate)
+                if isinstance(parsed, list):
+                    decoded_items = [str(x).strip() for x in parsed if str(x).strip()]
+                    break
+            except json.JSONDecodeError:
+                continue
+
+        if not decoded_items and source.startswith("[") and source.endswith("]"):
+            try:
+                parsed = ast.literal_eval(source)
+                if isinstance(parsed, list):
+                    decoded_items = [str(x).strip() for x in parsed if str(x).strip()]
+            except (ValueError, SyntaxError):
+                decoded_items = []
+
+        if decoded_items:
+            items = decoded_items
+        else:
+            split_tags = re.split(r"[,，/|、]", source)
+            items = [t.strip() for t in split_tags if t.strip()]
+
+    cleaned: List[str] = []
+    seen = set()
+    for item in items:
+        tag = sanitize_tag(item)
+        if not tag:
+            continue
+        key = tag.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        cleaned.append(tag)
+    return cleaned
+
+
+def sanitize_tag(tag: str) -> str:
+    value = html_lib.unescape((tag or "").strip())
+    if not value:
+        return ""
+
+    # Drop list/string wrappers and trailing punctuation noise.
+    value = value.strip(" \t\r\n[](){}'\"“”‘’")
+    value = re.sub(r"^\[+", "", value)
+    value = re.sub(r"\]+$", "", value)
+    value = value.strip(" \t\r\n'\"“”‘’")
+    value = re.sub(r"\s+", " ", value)
+    if not value:
+        return ""
+
+    # Exclude obvious broken tokens.
+    if re.fullmatch(r"[\?\-_/|.,;:]+", value):
+        return ""
+    if "??" in value:
+        return ""
+
+    if len(value) > 36:
+        value = value[:36].strip()
+    if len(value) < 2:
+        return ""
+    return value
 
 
 class AIBaseCasesCollector:
@@ -140,6 +201,13 @@ class AIBaseCasesCollector:
             for x in env.get("AIBASE_CASES_TAGS", "AI案例,案例拆解,AI变现").split(",")
             if x.strip()
         ]
+        self.default_tags = [sanitize_tag(x) for x in self.default_tags]
+        self.default_tags = [x for x in self.default_tags if x]
+        self.use_source_tags = env_bool(env, "AIBASE_CASES_USE_SOURCE_TAGS", False)
+        self.include_meta_in_content = env_bool(env, "AIBASE_CASES_INCLUDE_META_IN_CONTENT", False)
+        self.include_source_tags_in_content = env_bool(
+            env, "AIBASE_CASES_INCLUDE_SOURCE_TAGS_IN_CONTENT", False
+        )
         self.draft_status = env.get("AIBASE_CASES_DRAFT_STATUS", "draft").strip() or "draft"
         self.page_size = max(5, min(100, env_int(env, "AIBASE_CASES_PAGE_SIZE", 50)))
         self.batch_size = max(1, min(500, env_int(env, "AIBASE_CASES_BATCH_SIZE", 40)))
@@ -352,13 +420,20 @@ class AIBaseCasesCollector:
 
         for image in soup.find_all("img"):
             src = (image.get("src") or "").strip()
-            if src.startswith("//"):
-                src = "https:" + src
-            image["src"] = src
+            if not src:
+                src = (
+                    (image.get("data-src") or "").strip()
+                    or (image.get("data-original") or "").strip()
+                    or (image.get("data-lazy-src") or "").strip()
+                )
+            image["src"] = self.normalize_image_url(src)
             image["loading"] = "lazy"
             image["referrerpolicy"] = "no-referrer"
             image.attrs.pop("srcset", None)
             image.attrs.pop("sizes", None)
+            image.attrs.pop("data-src", None)
+            image.attrs.pop("data-original", None)
+            image.attrs.pop("data-lazy-src", None)
 
         if self.hide_source_link:
             for a in soup.find_all("a"):
@@ -377,6 +452,36 @@ class AIBaseCasesCollector:
         cleaned = str(soup).strip()
         return cleaned
 
+    def normalize_image_url(self, url: str) -> str:
+        src = (url or "").strip()
+        if not src:
+            return ""
+        if src.startswith("//"):
+            return "https:" + src
+        if src.startswith("/uploads/"):
+            return urljoin("https://upload.chinaz.com", src)
+        if src.startswith("/"):
+            return urljoin("https://www.aibase.com", src)
+        return src
+
+    def ensure_summary_has_image(self, summary_html: str, fallback_image_url: str) -> str:
+        if not summary_html.strip():
+            return summary_html
+        soup = BeautifulSoup(summary_html, "html.parser")
+        if soup.find("img"):
+            return summary_html
+
+        image_url = self.normalize_image_url(fallback_image_url)
+        if not image_url:
+            return summary_html
+
+        hero_html = (
+            '<p style="text-align:center;margin:0 0 16px;">'
+            f'<img src="{image_url}" alt="案例配图" loading="lazy" referrerpolicy="no-referrer" />'
+            "</p>"
+        )
+        return hero_html + summary_html
+
     def html_plain_text(self, html: str) -> str:
         soup = BeautifulSoup(html or "", "html.parser")
         text = soup.get_text(" ", strip=True)
@@ -394,7 +499,7 @@ class AIBaseCasesCollector:
         addtime_text: str,
     ) -> str:
         tag_blocks = ""
-        if tags:
+        if self.include_source_tags_in_content and tags:
             snippets = []
             for tag in tags[:8]:
                 snippets.append(
@@ -406,7 +511,7 @@ class AIBaseCasesCollector:
             tag_blocks = "".join(snippets)
 
         meta_block = ""
-        if addtime_text:
+        if self.include_meta_in_content and addtime_text:
             meta_block = (
                 '<p style="margin:0 0 10px;color:#6f86a2;font-size:13px;">'
                 f"发布时间：{addtime_text}"
@@ -574,8 +679,9 @@ class AIBaseCasesCollector:
             subtitle = str(detail.get("subtitle", "")).strip()
             description = sanitize_text(str(detail.get("description", "")).strip(), max_len=180)
             summary_html = self.clean_summary_html(str(detail.get("summary", "") or detail.get("content", "")).strip())
+            thumb = self.normalize_image_url(str(detail.get("thumb", "") or item.get("thumb", "")).strip())
+            summary_html = self.ensure_summary_has_image(summary_html, thumb)
             text_len = len(self.html_plain_text(summary_html))
-            thumb = str(detail.get("thumb", "") or item.get("thumb", "")).strip()
             addtime_text = str(detail.get("addtime", "") or item.get("addtime", "")).strip()
 
             if len(title) < self.title_min_len or len(title) > self.title_max_len:
@@ -612,10 +718,10 @@ class AIBaseCasesCollector:
                 )
                 continue
 
-            tags = parse_tags(detail.get("tags", ""))
+            source_tags = parse_tags(detail.get("tags", "")) if self.use_source_tags else []
             merged_tags = []
             seen_tags = set()
-            for tag in tags + self.default_tags:
+            for tag in source_tags + self.default_tags:
                 if not tag:
                     continue
                 key = tag.strip().lower()
