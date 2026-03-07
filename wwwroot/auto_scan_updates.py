@@ -21,12 +21,22 @@ from urllib.parse import urljoin
 from collections import defaultdict
 
 _ZERO_WIDTH_RE = re.compile(r'[\u200b\u200c\u200d\ufeff]')
+_VIEW_TAIL_RE_2 = re.compile(r'\s+[^\s]+\s+[^\s]+\s*\d+(?:\.\d+)?[Kk万]?\s*查看详情$')
+_VIEW_TAIL_RE_1 = re.compile(r'\s+[^\s]+\s*\d+(?:\.\d+)?[Kk万]?\s*查看详情$')
+_VIEW_ONLY_RE_2 = re.compile(r'\s+[^\s]+\s+[^\s]+\s*\d+(?:\.\d+)?[Kk万]?$')
+_VIEW_ONLY_RE_1 = re.compile(r'\s+[^\s]+\s*\d+(?:\.\d+)?[Kk万]?$')
 
 def clean_title(value):
     if not value:
         return value
     value = _ZERO_WIDTH_RE.sub('', value)
-    return value.strip()
+    value = value.strip()
+    value = _VIEW_TAIL_RE_2.sub('', value)
+    value = _VIEW_TAIL_RE_1.sub('', value)
+    value = value.replace('查看详情', '').strip()
+    value = _VIEW_ONLY_RE_2.sub('', value).strip()
+    value = _VIEW_ONLY_RE_1.sub('', value).strip()
+    return value
 
 def load_env():
     env = {}
