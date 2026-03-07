@@ -21,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urljoin
+from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -208,6 +209,15 @@ class AIBaseCasesCollector:
         self.include_source_tags_in_content = env_bool(
             env, "AIBASE_CASES_INCLUDE_SOURCE_TAGS_IN_CONTENT", False
         )
+        self.localize_content_images = env_bool(env, "AIBASE_CASES_LOCALIZE_CONTENT_IMAGES", True)
+        self.content_image_domains = [
+            x.strip().lower()
+            for x in env.get(
+                "AIBASE_CASES_CONTENT_IMAGE_DOMAINS",
+                "upload.chinaz.com,pic.chinaz.com,app.chinaz.com",
+            ).split(",")
+            if x.strip()
+        ]
         self.draft_status = env.get("AIBASE_CASES_DRAFT_STATUS", "draft").strip() or "draft"
         self.page_size = max(5, min(100, env_int(env, "AIBASE_CASES_PAGE_SIZE", 50)))
         self.batch_size = max(1, min(500, env_int(env, "AIBASE_CASES_BATCH_SIZE", 40)))
@@ -247,6 +257,7 @@ class AIBaseCasesCollector:
         self.history = self.load_history()
         self.collected_ids: Dict[str, Dict[str, object]] = dict(self.history.get("collected_ids", {}))
         self.failed_ids: Dict[str, Dict[str, object]] = dict(self.history.get("failed_ids", {}))
+        self.image_map: Dict[str, str] = dict(self.history.get("image_map", {}))
         self.existing_titles = set()
         self.non_retry_failed_ids = self.build_non_retry_failed_ids()
 
@@ -309,6 +320,7 @@ class AIBaseCasesCollector:
         payload = {
             "collected_ids": self.collected_ids,
             "failed_ids": self.failed_ids,
+            "image_map": self.image_map,
             "last_run": datetime.now().isoformat(),
         }
         with self.history_path.open("w", encoding="utf-8") as fh:
@@ -463,6 +475,77 @@ class AIBaseCasesCollector:
         if src.startswith("/"):
             return urljoin("https://www.aibase.com", src)
         return src
+
+    def should_localize_image(self, src: str) -> bool:
+        url = self.normalize_image_url(src)
+        if not url:
+            return False
+        try:
+            host = (urlparse(url).hostname or "").strip().lower()
+        except ValueError:
+            return False
+        if not host:
+            return False
+        if self.wp_url:
+            wp_host = (urlparse(self.wp_url).hostname or "").strip().lower()
+            if wp_host and host == wp_host:
+                return False
+        for domain in self.content_image_domains:
+            if host == domain or host.endswith("." + domain):
+                return True
+        return False
+
+    def localize_summary_images(self, html: str) -> str:
+        if not self.localize_content_images or not html.strip():
+            return html
+
+        soup = BeautifulSoup(html, "html.parser")
+        changed = False
+        localized_count = 0
+
+        for image in soup.find_all("img"):
+            src = (image.get("src") or "").strip()
+            if not src:
+                src = (
+                    (image.get("data-src") or "").strip()
+                    or (image.get("data-original") or "").strip()
+                    or (image.get("data-lazy-src") or "").strip()
+                )
+            src = self.normalize_image_url(src)
+            if not src:
+                continue
+
+            new_src = src
+            if self.should_localize_image(src):
+                cached = self.image_map.get(src, "").strip()
+                if cached:
+                    new_src = cached
+                else:
+                    _, uploaded_url = self.upload_featured_image(src)
+                    if uploaded_url:
+                        new_src = str(uploaded_url).strip()
+                        if not self.dry_run:
+                            self.image_map[src] = new_src
+
+            if new_src and new_src != src:
+                image["src"] = new_src
+                changed = True
+                localized_count += 1
+            else:
+                image["src"] = src
+
+            image.attrs.pop("srcset", None)
+            image.attrs.pop("sizes", None)
+            image.attrs.pop("data-src", None)
+            image.attrs.pop("data-original", None)
+            image.attrs.pop("data-lazy-src", None)
+            image["loading"] = "lazy"
+            image["referrerpolicy"] = "no-referrer"
+
+        if changed:
+            print(f"[info] localized content images: {localized_count}")
+            return str(soup).strip()
+        return html
 
     def ensure_summary_has_image(self, summary_html: str, fallback_image_url: str) -> str:
         if not summary_html.strip():
@@ -679,6 +762,7 @@ class AIBaseCasesCollector:
             subtitle = str(detail.get("subtitle", "")).strip()
             description = sanitize_text(str(detail.get("description", "")).strip(), max_len=180)
             summary_html = self.clean_summary_html(str(detail.get("summary", "") or detail.get("content", "")).strip())
+            summary_html = self.localize_summary_images(summary_html)
             thumb = self.normalize_image_url(str(detail.get("thumb", "") or item.get("thumb", "")).strip())
             summary_html = self.ensure_summary_has_image(summary_html, thumb)
             text_len = len(self.html_plain_text(summary_html))

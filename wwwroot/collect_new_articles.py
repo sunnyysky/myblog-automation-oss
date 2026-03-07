@@ -21,6 +21,14 @@ from urllib.parse import urljoin
 from collections import Counter
 import paramiko
 
+_ZERO_WIDTH_RE = re.compile(r'[\u200b\u200c\u200d\ufeff]')
+
+def clean_title(value):
+    if not value:
+        return value
+    value = _ZERO_WIDTH_RE.sub('', value)
+    return value.strip()
+
 # 导入采集器的核心功能
 from collect_all_123 import AllCollector
 
@@ -55,6 +63,8 @@ def main():
     for i, article_info in enumerate(new_articles, 1):
         print(f"\n[{i}/{len(new_articles)}]", end=' ')
 
+        if 'title' in article_info:
+            article_info['title'] = clean_title(article_info.get('title'))
         article = collector.get_article_detail(article_info)
 
         if article:

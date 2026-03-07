@@ -35,6 +35,7 @@ python wwwroot/collect_external_feeds.py --dry-run
 python wwwroot/collect_aibase_cases.py --mode incremental --max-pages 1 --batch-size 5 --dry-run
 python wwwroot/auto_publish_cases_daily.py --slot manual --count 2 --dry-run
 python wwwroot/health_check_cases.py
+php wwwroot/guard_published_images.php --dry-run
 ```
 
 ## Deployment Principle

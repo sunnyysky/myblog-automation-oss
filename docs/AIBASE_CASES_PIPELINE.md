@@ -17,6 +17,7 @@ This pipeline collects all AI cases from `https://www.aibase.com/zh/cases`, stor
 - Cleans malformed source tags (brackets/quotes/乱码 tokens).
 - By default, uses curated tags only (`AIBASE_CASES_USE_SOURCE_TAGS=0`).
 - By default, does not render source publish-time/tag chips in article body.
+- Localizes hotlink-protected source images to local WP media by default.
 - Enforces basic quality gate before draft creation:
   - title length
   - minimum text length
@@ -59,6 +60,8 @@ AIBASE_CASES_TAGS=AI案例,案例拆解,AI变现
 AIBASE_CASES_USE_SOURCE_TAGS=0
 AIBASE_CASES_INCLUDE_META_IN_CONTENT=0
 AIBASE_CASES_INCLUDE_SOURCE_TAGS_IN_CONTENT=0
+AIBASE_CASES_LOCALIZE_CONTENT_IMAGES=1
+AIBASE_CASES_CONTENT_IMAGE_DOMAINS=upload.chinaz.com,pic.chinaz.com,app.chinaz.com
 AIBASE_CASES_NO_SOURCE_LINK=1
 AIBASE_CASES_SLEEP_SECONDS=1
 AIBASE_CASES_HISTORY_FILE=wwwroot/runtime/aibase_cases_history.json
@@ -120,4 +123,7 @@ python wwwroot/auto_publish_cases_daily.py --slot evening
 
 # Optional health check report (warnings/errors only)
 10 19 * * * cd /www/wwwroot/www.skyrobot.top && /usr/bin/python3 health_check_cases.py --strict >> /var/log/aibase_cases_health.log 2>&1
+
+# Global published-post image guard (auto-fix posts missing content images)
+15 3 * * * cd /www/wwwroot/www.skyrobot.top && /usr/bin/php guard_published_images.php --apply --limit=300 >> /var/log/published_image_guard.log 2>&1
 ```

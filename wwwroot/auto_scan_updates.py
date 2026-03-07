@@ -20,6 +20,14 @@ from datetime import datetime
 from urllib.parse import urljoin
 from collections import defaultdict
 
+_ZERO_WIDTH_RE = re.compile(r'[\u200b\u200c\u200d\ufeff]')
+
+def clean_title(value):
+    if not value:
+        return value
+    value = _ZERO_WIDTH_RE.sub('', value)
+    return value.strip()
+
 def load_env():
     env = {}
     for p in ('../.env', '.env'):
@@ -117,7 +125,7 @@ class UpdateScanner:
                 if not title_elem:
                     title_elem = link
 
-                title = title_elem.get_text().strip()
+                title = clean_title(title_elem.get_text())
                 if not title or len(title) < 5:
                     continue
 

@@ -40,6 +40,16 @@ wwwroot/*
 !wwwroot/collect_aibase_cases.py
 !wwwroot/auto_publish_cases_daily.py
 !wwwroot/health_check_cases.py
+!wwwroot/guard_published_images.php
+!wwwroot/wp-content/
+!wwwroot/wp-content/themes/
+!wwwroot/wp-content/themes/justnews/
+!wwwroot/wp-content/themes/justnews/index.php
+!wwwroot/wp-content/themes/justnews/header.php
+!wwwroot/wp-content/themes/justnews/functions.php
+!wwwroot/wp-content/themes/justnews/themer/
+!wwwroot/wp-content/themes/justnews/themer/core/
+!wwwroot/wp-content/themes/justnews/themer/core/wpcom.php
 
 # Python cache / runtime artifacts
 __pycache__/

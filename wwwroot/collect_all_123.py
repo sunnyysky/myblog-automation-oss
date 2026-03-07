@@ -17,6 +17,14 @@ from urllib.parse import urljoin
 from collections import Counter
 import paramiko
 
+_ZERO_WIDTH_RE = re.compile(r'[\u200b\u200c\u200d\ufeff]')
+
+def clean_title(value):
+    if not value:
+        return value
+    value = _ZERO_WIDTH_RE.sub('', value)
+    return value.strip()
+
 def load_env():
     env = {}
     for p in ('../.env', '.env'):
@@ -173,7 +181,7 @@ class AllCollector:
             lines = result.strip().split('\n')
             for line in lines[1:]:
                 if line.strip():
-                    title = line.strip()
+                    title = clean_title(line.strip())
                     self.published_titles.add(title)
 
             print(f"已加载 {len(self.published_titles)} 篇已发布文章")
@@ -221,7 +229,7 @@ class AllCollector:
 
     def get_article_detail(self, article_info):
         article_url = article_info['url']
-        title = article_info['title']
+        title = clean_title(article_info['title'])
         category = article_info.get('category', 'AI工具')
         print(f"  [{category:12s}] {title}")
 
