@@ -35,6 +35,7 @@ from collect_all_123 import AllCollector
 def main():
     parser = argparse.ArgumentParser(description='采集新发现的文章')
     parser.add_argument('--file', required=True, help='新文章JSON文件路径')
+    parser.add_argument('--limit', type=int, default=0, help='采集数量上限(0表示不限制)')
     args = parser.parse_args()
 
     # 加载新文章列表
@@ -53,18 +54,39 @@ def main():
     # 使用现有的采集器
     collector = AllCollector()
 
+    # 去重：标题归一化 + 过滤已存在文章
+    unique_articles = []
+    seen_titles = set()
+    for article_info in new_articles:
+        if 'title' in article_info:
+            article_info['title'] = clean_title(article_info.get('title'))
+        title = article_info.get('title', '')
+        if not title:
+            continue
+        if title in seen_titles:
+            continue
+        seen_titles.add(title)
+        if title in collector.published_titles:
+            continue
+        unique_articles.append(article_info)
+
+    if not unique_articles:
+        print("没有需要采集的文章（可能已全部入库或重复）")
+        return
+
+    if args.limit and args.limit > 0:
+        unique_articles = unique_articles[:args.limit]
+
     print("\n" + "="*120)
-    print(f"开始采集 {len(new_articles)} 篇新文章")
+    print(f"开始采集 {len(unique_articles)} 篇新文章")
     print("="*120)
 
     success_count = 0
     failed_count = 0
 
-    for i, article_info in enumerate(new_articles, 1):
-        print(f"\n[{i}/{len(new_articles)}]", end=' ')
+    for i, article_info in enumerate(unique_articles, 1):
+        print(f"\n[{i}/{len(unique_articles)}]", end=' ')
 
-        if 'title' in article_info:
-            article_info['title'] = clean_title(article_info.get('title'))
         article = collector.get_article_detail(article_info)
 
         if article:
