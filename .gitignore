@@ -41,6 +41,7 @@ wwwroot/*
 !wwwroot/auto_publish_cases_daily.py
 !wwwroot/health_check_cases.py
 !wwwroot/guard_published_images.php
+!wwwroot/auto_collect_new_articles.py
 !wwwroot/wp-content/
 !wwwroot/wp-content/themes/
 !wwwroot/wp-content/themes/justnews/
