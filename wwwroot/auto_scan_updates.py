@@ -105,7 +105,7 @@ class UpdateScanner:
             soup = BeautifulSoup(response.text, 'html.parser')
 
             articles = []
-            article_links = soup.find_all('a', href=re.compile(r'/zh/\d+'))
+            article_links = soup.find_all('a', href=re.compile(r'/zh/(details/)?\d+'))
 
             seen_urls = set()
             for link in article_links:
@@ -114,6 +114,8 @@ class UpdateScanner:
                     continue
 
                 article_url = urljoin(self.base_url, href)
+                if '/zh/details/' not in article_url and re.search(r'/zh/\d+$', article_url):
+                    article_url = article_url.replace('/zh/', '/zh/details/', 1)
                 if article_url in seen_urls:
                     continue
                 seen_urls.add(article_url)
